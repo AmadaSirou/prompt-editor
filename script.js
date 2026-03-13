@@ -257,8 +257,8 @@ function saveCurrentPrompt() {
   }
 
   saveToStorage();
-  renderEditingId();
   renderAll();
+  renderEditingId();
 }
 
 /** [Delete] ボタン */
@@ -275,8 +275,8 @@ function deleteCurrentPrompt() {
   currentVars = [];
 
   renderEditTags([]);
-  renderEditingId();
   renderAll();
+  renderEditingId();
   showToast('削除しました');
 }
 
@@ -289,10 +289,8 @@ function clearAll() {
   currentVars = [];
 
   renderEditTags([]);
+  renderAll();
   renderEditingId();
-  renderPromptList();
-  renderVarList();
-  updateVarCount(0);
   showToast('クリアしました');
 }
 
@@ -385,8 +383,7 @@ function scanVars() {
 }
 
 function updateVarCount(unique) {
-  const el = document.getElementById('varCount'); // 左ペインには置いていないが念のため
-  // varCount は prompt-list-pane 内。変数数は topbar の varCount は削除したので不要。
+  // varCount 要素は prompt-list-pane 内のみ存在。変数エディタ側は表示不要のため何もしない。
 }
 
 /** 変数リストを描画 */
