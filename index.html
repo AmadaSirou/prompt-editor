@@ -12,80 +12,81 @@
   <span class="logo">PromptVar</span>
   <span class="header-sep">|</span>
   <span class="header-sub">Prompt Manager &amp; Variable Editor</span>
-  <div class="header-right">
-    <span class="prompt-counter" id="promptCounter">0 / 100</span>
-    <button class="btn-add" id="btnAdd" onclick="addNewPrompt()">＋ 新規追加</button>
-  </div>
 </header>
 
+<!-- タグ検索バー (上部) -->
 <div class="tag-bar">
   <div class="tag-search-wrap">
     <span class="tag-search-label">タグ検索:</span>
-    <input type="text" id="tagSearchInput" class="tag-search-input" placeholder="タグ名を入力..." oninput="onTagSearchInput()">
+    <input type="text" id="tagSearchInput" class="tag-search-input"
+      placeholder="タグ名を入力..." oninput="onTagSearchInput()">
   </div>
 
   <div class="selected-tags-wrap">
     <span class="tags-section-label">選択タグ</span>
     <div class="selected-tags" id="selectedTags">
-      <span class="no-tags-hint" id="noSelectedHint">（なし）</span>
+      <span class="no-tags-hint">（なし）</span>
     </div>
   </div>
 
   <div class="candidate-tags-wrap">
     <span class="tags-section-label">候補タグ</span>
-    <div class="candidate-tags" id="candidateTags"></div>
+    <div class="candidate-tags" id="candidateTags">
+      <span class="no-tags-hint">（タグなし）</span>
+    </div>
   </div>
 </div>
 
 <div class="workspace">
 
-  <!-- 左列: 既存のVariable Editor -->
+  <!-- 左列: Variable Editor (既存機能) -->
   <div class="left">
     <div class="pane-label">
       <span class="dot dot-teal"></span>
       Variables
     </div>
     <div class="var-list" id="varList">
-      <div class="var-list-empty" id="emptyMsg">
+      <div class="var-list-empty">
         変数がありません<br>
         <span class="hint">プロンプトに {{変数名}} を入力してください</span>
       </div>
     </div>
     <div class="left-actions">
       <button class="btn btn-apply" onclick="applyVars()">▶&nbsp;&nbsp;変更を適用</button>
-      <button class="btn btn-clear" onclick="clearPromptArea()">✕&nbsp;&nbsp;プロンプトをクリア</button>
     </div>
   </div>
 
   <!-- 右列: プロンプト管理 -->
   <div class="right">
 
-    <!-- プロンプト一覧 -->
-    <div class="prompt-list-pane" id="promptListPane">
+    <!-- プロンプトカード一覧 (横スクロール) -->
+    <div class="prompt-list-pane">
       <div class="pane-label">
         <span class="dot dot-accent"></span>
         Prompt List
         <span class="var-count" id="filteredCount"></span>
       </div>
       <div class="prompt-list" id="promptList">
-        <div class="empty-list" id="emptyList">プロンプトがありません</div>
+        <div class="empty-list">プロンプトがありません</div>
       </div>
     </div>
 
     <!-- プロンプト編集エリア -->
-    <div class="prompt-edit-pane" id="promptEditPane">
+    <div class="prompt-edit-pane">
+
+      <!-- ツールバー: Tag no / 編集中ID / ボタン群 -->
       <div class="prompt-topbar">
-        <div class="prompt-topbar-left">
-          <div class="pane-label" style="border:none;padding:0;">
-            <span class="dot dot-accent"></span>
-            Prompt Editor
-          </div>
-          <span class="var-count" id="varCount"></span>
+        <div class="topbar-left">
+          <span class="tag-no-label">Tag no: <strong id="promptCountDisplay">0</strong> / 100</span>
+          <!-- 編集中IDをボタンの隣に表示 -->
+          <span class="editing-id" id="editingId"></span>
         </div>
-        <div class="prompt-topbar-right">
-          <button class="copy-btn" onclick="copyPrompt()">Copy</button>
-          <button class="save-btn" onclick="saveCurrentPrompt()">Save</button>
-          <button class="delete-btn" id="deleteBtn" onclick="deleteCurrentPrompt()" style="display:none">Delete</button>
+        <div class="topbar-btns">
+          <button class="tb-btn tb-add"    onclick="addNewPrompt()">Addtag</button>
+          <button class="tb-btn tb-copy"   onclick="copyPrompt()">Copy</button>
+          <button class="tb-btn tb-save"   onclick="saveCurrentPrompt()">Save</button>
+          <button class="tb-btn tb-delete" id="deleteBtn" onclick="deleteCurrentPrompt()" style="display:none">Delete</button>
+          <button class="tb-btn tb-clear"  onclick="clearAll()">Clear</button>
         </div>
       </div>
 
@@ -94,22 +95,21 @@
         <div class="tag-edit-label">タグ:</div>
         <div class="tag-edit-row">
           <div class="current-tags" id="currentTags"></div>
-          <input type="text" id="tagAddInput" class="tag-add-input" placeholder="タグを入力してEnter..." onkeydown="onTagAddKeydown(event)">
+          <input type="text" id="tagAddInput" class="tag-add-input"
+            placeholder="タグを入力してEnter..."
+            oninput="onTagAddInputChange()"
+            onkeydown="onTagAddKeydown(event)">
         </div>
       </div>
 
-      <!-- メモ -->
-      <div class="memo-area">
-        <textarea id="memoArea" class="memo-textarea" placeholder="メモ（任意）" oninput="onMemoInput()"></textarea>
-      </div>
-
+      <!-- プロンプト textarea -->
       <textarea id="promptArea"
         placeholder="ここにプロンプトを入力...&#10;&#10;変数は {{変数名}} の形式で記述できます。&#10;例: masterpiece, {{style}} girl, {{quality}}"
         oninput="onPromptInput()"
         onpaste="setTimeout(onPromptInput, 0)"
       ></textarea>
-    </div>
 
+    </div>
   </div>
 </div>
 

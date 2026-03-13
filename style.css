@@ -50,9 +50,7 @@ header {
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
-
 .header-sep { color: var(--border2); font-size: 18px; }
-
 .header-sub {
   font-size: 10px;
   color: var(--text-dim);
@@ -60,42 +58,11 @@ header {
   text-transform: uppercase;
 }
 
-.header-right {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.prompt-counter {
-  font-size: 10px;
-  color: var(--text-dim);
-  letter-spacing: 0.06em;
-}
-
-.btn-add {
-  background: var(--accent);
-  color: #0a0c0f;
-  border: none;
-  border-radius: var(--radius);
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  padding: 6px 14px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.btn-add:hover {
-  background: #d8f880;
-  box-shadow: 0 0 16px rgba(200,240,96,0.2);
-}
-
 /* ===== Tag Bar ===== */
 .tag-bar {
   display: flex;
   align-items: flex-start;
-  gap: 24px;
+  gap: 20px;
   padding: 10px 24px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -109,14 +76,12 @@ header {
   gap: 8px;
   flex-shrink: 0;
 }
-
 .tag-search-label {
   font-size: 10px;
   color: var(--text-dim);
   letter-spacing: 0.08em;
   white-space: nowrap;
 }
-
 .tag-search-input {
   background: var(--surface2);
   border: 1px solid var(--border2);
@@ -137,7 +102,7 @@ header {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
-  margin-right: 8px;
+  margin-right: 6px;
   flex-shrink: 0;
 }
 
@@ -147,10 +112,11 @@ header {
   align-items: flex-start;
   gap: 4px;
   flex: 1;
-  min-width: 0;
+  min-width: 120px;
 }
 
-.selected-tags {
+.selected-tags,
+.candidate-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
@@ -183,13 +149,7 @@ header {
 }
 .tag-chip .remove-tag:hover { opacity: 1; }
 
-/* 候補タグ一覧 */
-.candidate-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
+/* 候補タグ */
 .candidate-tag {
   font-size: 10px;
   color: var(--text-dim);
@@ -199,15 +159,16 @@ header {
   cursor: pointer;
   transition: all 0.12s;
   background: transparent;
+  user-select: none;
 }
 .candidate-tag:hover {
   color: var(--teal);
   border-color: var(--teal);
   background: var(--teal-dim);
 }
-.candidate-tag.selected {
-  color: var(--text-dim);
-  opacity: 0.4;
+/* 既に選択済み → グレーアウトしてクリック不可 */
+.candidate-tag.already-selected {
+  opacity: 0.35;
   cursor: default;
   pointer-events: none;
 }
@@ -255,7 +216,6 @@ header {
   flex-direction: column;
   gap: 5px;
 }
-
 .var-list::-webkit-scrollbar { width: 3px; }
 .var-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
@@ -302,10 +262,7 @@ header {
   max-width: 126px;
   overflow: hidden;
 }
-.var-name span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.var-name span { overflow: hidden; text-overflow: ellipsis; }
 
 .var-input {
   flex: 1;
@@ -342,7 +299,6 @@ header {
   cursor: pointer;
   transition: all 0.15s;
 }
-
 .btn-apply {
   background: var(--accent);
   color: #0a0c0f;
@@ -354,20 +310,10 @@ header {
 }
 .btn-apply:active { transform: none; }
 
-.btn-clear {
-  background: transparent;
-  color: var(--warn);
-  border: 1px solid rgba(232,122,74,0.28);
-}
-.btn-clear:hover {
-  background: rgba(232,122,74,0.07);
-  border-color: var(--warn);
-}
-
-/* ===== Right (Prompt管理) ===== */
+/* ===== Right ===== */
 .right {
   display: grid;
-  grid-template-rows: 220px 1fr;
+  grid-template-rows: 200px 1fr;
   overflow: hidden;
   background: var(--bg);
 }
@@ -390,8 +336,8 @@ header {
 
 .prompt-list {
   flex: 1;
-  overflow-y: auto;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 8px 12px;
   display: flex;
   gap: 8px;
@@ -411,7 +357,7 @@ header {
 /* プロンプトカード */
 .prompt-card {
   flex-shrink: 0;
-  width: 200px;
+  width: 180px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
@@ -420,8 +366,8 @@ header {
   transition: border-color 0.15s, background 0.15s;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  min-height: 100px;
+  gap: 5px;
+  min-height: 90px;
 }
 .prompt-card:hover { border-color: var(--border2); background: var(--surface2); }
 .prompt-card.active {
@@ -435,13 +381,11 @@ header {
   color: var(--text-dim);
   letter-spacing: 0.1em;
 }
-
 .card-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 3px;
 }
-
 .card-tag {
   font-size: 9px;
   color: var(--teal);
@@ -450,7 +394,6 @@ header {
   border-radius: 3px;
   padding: 1px 5px;
 }
-
 .card-preview {
   font-size: 10px;
   color: var(--text-dim);
@@ -462,73 +405,95 @@ header {
   flex: 1;
 }
 
-/* プロンプト編集ペイン */
+/* ===== Prompt Edit Pane ===== */
 .prompt-edit-pane {
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
+/* ツールバー */
 .prompt-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   flex-shrink: 0;
-}
-
-.prompt-topbar-left {
-  display: flex;
-  align-items: center;
   gap: 12px;
 }
 
-.prompt-topbar-right {
+.topbar-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
-.copy-btn, .save-btn, .delete-btn {
+.tag-no-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.tag-no-label strong { color: var(--accent); font-weight: 600; }
+
+/* 編集中ID表示 */
+.editing-id {
+  font-size: 10px;
+  color: var(--teal);
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+/* ボタン群 */
+.topbar-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tb-btn {
   background: transparent;
   border: 1px solid var(--border2);
   color: var(--text-dim);
   font-family: var(--mono);
   font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   padding: 5px 12px;
   border-radius: 5px;
   cursor: pointer;
   text-transform: uppercase;
   transition: all 0.15s;
+  white-space: nowrap;
 }
-.copy-btn:hover { border-color: var(--teal); color: var(--teal); }
-.save-btn:hover { border-color: var(--accent); color: var(--accent); }
-.delete-btn { border-color: rgba(232,122,74,0.3); color: var(--warn); }
-.delete-btn:hover { background: rgba(232,122,74,0.08); border-color: var(--warn); }
+
+.tb-add:hover    { border-color: var(--accent); color: var(--accent); }
+.tb-copy:hover   { border-color: var(--teal); color: var(--teal); }
+.tb-save:hover   { border-color: var(--accent); color: var(--accent); }
+.tb-delete       { border-color: rgba(232,122,74,0.3); color: var(--warn); }
+.tb-delete:hover { background: rgba(232,122,74,0.08); border-color: var(--warn); }
+.tb-clear:hover  { border-color: var(--border2); color: var(--text-bright); }
 
 /* タグ編集エリア */
 .tag-edit-area {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 8px 20px;
+  padding: 8px 16px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   flex-shrink: 0;
   flex-wrap: wrap;
 }
-
 .tag-edit-label {
   font-size: 10px;
   color: var(--text-dim);
   padding-top: 4px;
   flex-shrink: 0;
 }
-
 .tag-edit-row {
   display: flex;
   flex-wrap: wrap;
@@ -566,35 +531,11 @@ header {
   font-size: 10px;
   padding: 3px 8px;
   outline: none;
-  width: 160px;
+  width: 180px;
 }
 .tag-add-input:focus { border-color: var(--teal); }
 
-/* メモエリア */
-.memo-area {
-  padding: 8px 20px 0;
-  flex-shrink: 0;
-}
-
-.memo-textarea {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 8px 10px;
-  resize: none;
-  outline: none;
-  height: 40px;
-  line-height: 1.5;
-  transition: border-color 0.15s;
-}
-.memo-textarea:focus { border-color: var(--border2); }
-.memo-textarea::placeholder { color: var(--text-dim); font-style: italic; }
-
-/* プロンプトtextarea */
+/* プロンプト textarea */
 #promptArea {
   flex: 1;
   background: transparent;
@@ -607,7 +548,6 @@ header {
   padding: 16px 24px;
   resize: none;
   overflow-y: auto;
-  margin-top: 8px;
 }
 #promptArea::-webkit-scrollbar { width: 5px; }
 #promptArea::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
