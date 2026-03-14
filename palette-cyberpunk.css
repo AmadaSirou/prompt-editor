@@ -1,0 +1,19 @@
+/**
+ * エネルギッシュでサイバーパンクな配色
+ * Energetic Cyberpunk
+ */
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #13111a;
+  --surface2: #1e1b26;
+  --border: #2d2a3e;
+  --border2: #3d3a52;
+  --accent: #06b6d4;
+  --teal: #ec4899;
+  --teal-dim: rgba(236, 72, 153, 0.12);
+  --warn: #f472b6;
+  --text: #f0e6ff;
+  --text-dim: #7c7c9e;
+  --text-bright: #e9d5ff;
+}

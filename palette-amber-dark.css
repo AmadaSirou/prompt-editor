@@ -1,0 +1,19 @@
+/**
+ * アンバー系（ダークモード）
+ * Amber - Dark Mode
+ */
+
+:root {
+  --bg: #1c1917;
+  --surface: #292524;
+  --surface2: #44403c;
+  --border: #44403c;
+  --border2: #57534e;
+  --accent: #fbbf24;
+  --teal: #f59e0b;
+  --teal-dim: rgba(245, 158, 11, 0.12);
+  --warn: #f97316;
+  --text: #fafaf9;
+  --text-dim: #78716c;
+  --text-bright: #fef3c7;
+}

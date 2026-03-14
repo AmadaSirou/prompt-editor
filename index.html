@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Variable Editor</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <span class="logo">PromptVar</span>
+  <span class="header-sep">|</span>
+  <span class="header-sub">LLM Prompt Variable Editor</span>
+</header>
+
+<div class="workspace">
+
+  <div class="left">
+    <div class="pane-label">
+      <span class="dot dot-teal"></span>
+      Variables
+    </div>
+    <div class="var-list" id="varList">
+      <div class="var-list-empty" id="emptyMsg">
+        変数がありません<br>
+        <span class="hint">プロンプトに {{変数名}} を入力してください</span>
+      </div>
+    </div>
+    <div class="left-actions">
+      <button class="btn btn-apply" onclick="applyVars()">▶&nbsp;&nbsp;変更を適用</button>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="tagbar">
+      <div class="tagbar-row1">
+        <textarea id="tagNameInput" class="tagname-input" rows="1" placeholder="プロンプト名 を入力..."></textarea>
+        <span class="tagbar-sep">:</span>
+        <button class="tag-btn" type="button" onclick="document.getElementById('importFile').click()">Import</button>
+        <button class="tag-btn" type="button" onclick="exportTags()">Export</button>
+        <input type="file" id="importFile" class="tagbar-file-input" accept=".json" onchange="importTags(this)">
+        <span class="tagbar-sep">|</span>
+        <button class="tag-btn" onclick="saveCurrentPrompt()">Save</button>
+        <button class="tag-btn" onclick="newTag()">New</button>
+        <button class="tag-btn tag-btn-danger" onclick="deleteTag()">DEL</button>
+      </div>
+      <div class="tagbar-row2" id="tagList"></div>
+    </div>
+    <div class="prompt-topbar">
+      <div class="prompt-topbar-left">
+        <div class="pane-label" style="border:none;padding:0;">
+          <span class="dot dot-accent"></span>
+          Prompt
+        </div>
+        <span class="var-count" id="varCount"></span>
+      </div>
+      <div class="prompt-topbar-actions">
+        <button class="copy-btn" type="button" onclick="clearPrompt()">Clear</button>
+        <button class="copy-btn" type="button" onclick="copyPrompt()">Copy</button>
+      </div>
+    </div>
+    <textarea id="promptArea"
+      placeholder="ここにプロンプトを貼り付けてください&#10;&#10;【このツールについて】&#10;LLMプロンプト内の変数 {{変数名}} を簡単に書き換えるエディタです。&#10;&#10;【使い方】&#10;1. このエリアにプロンプトを貼り付ける&#10;2. {{変数名}} 形式の変数が左パネルに自動検出される&#10;3. 同じ変数名が複数あっても1種類にまとめて管理&#10;4. 左の入力欄に置き換えたい値を入力する&#10;5. 「変更を適用」ボタン（またはEnterキー）で一括置換&#10;6. Copyボタンで完成したプロンプトをクリップボードにコピー&#10;&#10;例: Hello {{name}}, your role is {{role}}."
+      oninput="scanVars()"
+      onpaste="setTimeout(scanVars, 0)"
+    ></textarea>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
