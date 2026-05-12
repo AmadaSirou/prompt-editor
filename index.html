@@ -41,6 +41,7 @@
         <button class="tag-btn" type="button" onclick="exportTags()">Export</button>
         <input type="file" id="importFile" class="tagbar-file-input" accept=".json" onchange="importTags(this)">
         <span class="tagbar-sep">|</span>
+        <button class="tag-btn" onclick="newGroup()">New Group</button>
         <button class="tag-btn" onclick="saveCurrentPrompt()">Save</button>
         <button class="tag-btn" onclick="newTag()">New</button>
         <button class="tag-btn tag-btn-danger" onclick="deleteTag()">DEL</button>
@@ -61,7 +62,7 @@
       </div>
     </div>
     <textarea id="promptArea"
-      placeholder="ここにプロンプトを貼り付けてください&#10;&#10;【このツールについて】&#10;LLMプロンプト内の変数 {{変数名}} を簡単に書き換えるエディタです。&#10;&#10;【使い方】&#10;1. このエリアにプロンプトを貼り付ける&#10;2. {{変数名}} 形式の変数が左パネルに自動検出される&#10;3. 同じ変数名が複数あっても1種類にまとめて管理&#10;4. 左の入力欄に置き換えたい値を入力する&#10;5. 「変更を適用」ボタン（またはEnterキー）で一括置換&#10;6. Copyボタンで完成したプロンプトをクリップボードにコピー&#10;&#10;例: Hello {{name}}, your role is {{role}}."
+      placeholder="ここにプロンプトを貼り付けてください&#10;&#10;【このツールについて】&#10;LLMプロンプト内の変数 {{変数名}} を簡単に書き換えるエディタです。&#10;&#10;【使い方】&#10;1. このエリアにプロンプトを貼り付ける&#10;2. {{変数名}} 形式の変数が左パネルに自動検出される&#10;3. 同じ変数名が複数あっても1種類にまとめて管理&#10;4. 左の入力欄に置き換えたい値を入力する&#10;5. 「変更を適用」ボタン（またはEnterキー）で一括置換&#10;6. Copyボタンで完成したプロンプトをクリップボードにコピー&#10;&#10;【グループ管理】&#10;・追加: 「New Group」ボタンでグループを作成&#10;・変更: グループ名をダブルクリックで名前を変更&#10;・削除: グループを右クリック →「削除」（タグは未分類に移動）&#10;・タグを移動: タグを右クリック →「グループに移動」&#10;&#10;例: Hello {{name}}, your role is {{role}}."
       oninput="scanVars()"
       onpaste="setTimeout(scanVars, 0)"
     ></textarea>
@@ -70,6 +71,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="ctxMenu" class="ctx-menu hidden"></div>
 
 <script src="script.js"></script>
 </body>

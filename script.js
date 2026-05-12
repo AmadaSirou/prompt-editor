@@ -1,7 +1,10 @@
 const STORAGE_KEY = 'promptTags';
+const GROUP_STORAGE_KEY = 'promptGroups';
 let currentVars = []; // [{ name, value }]
-let savedTags = [];   // [{ id, prompt, tagname, updatedAt }]
+let savedTags = [];   // [{ id, prompt, tagname, updatedAt, groupId }]
+let savedGroups = []; // [{ id, name, collapsed }]
 let activeTagId = null;
+let ungroupedCollapsed = false;
 
 function scanVars() {
   const prompt = document.getElementById('promptArea').value;
@@ -158,7 +161,8 @@ function importTags(fileInput) {
           id: t.id ?? Date.now() + Math.random(),
           prompt: String(t.prompt ?? ''),
           tagname: String(t.tagname ?? ''),
-          updatedAt: t.updatedAt ?? Date.now()
+          updatedAt: t.updatedAt ?? Date.now(),
+          groupId: t.groupId ?? null
         }));
       activeTagId = null;
       persistTags();
@@ -198,7 +202,7 @@ function saveCurrentPrompt() {
     activeTagId = tag.id;
   } else {
     const id = now;
-    tag = { id, prompt, tagname, updatedAt: now };
+    tag = { id, prompt, tagname, updatedAt: now, groupId: null };
     savedTags.push(tag);
     activeTagId = id;
   }
@@ -261,18 +265,258 @@ function renderTagList() {
   if (!list) return;
 
   list.innerHTML = '';
-  if (!savedTags.length) return;
 
-  const sorted = [...savedTags].sort((a, b) => b.updatedAt - a.updatedAt);
+  const sortedTags = [...savedTags].sort((a, b) => b.updatedAt - a.updatedAt);
 
-  sorted.forEach(tag => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'tag-pill' + (tag.id === activeTagId ? ' active' : '');
-    btn.textContent = tag.tagname;
-    btn.onclick = () => selectTag(tag.id);
-    list.appendChild(btn);
+  if (savedGroups.length === 0) {
+    sortedTags.forEach(tag => list.appendChild(createTagPill(tag)));
+    return;
+  }
+
+  const groupIds = new Set(savedGroups.map(group => group.id));
+  const ungrouped = sortedTags.filter(tag => tag.groupId === null || !groupIds.has(tag.groupId));
+  appendGroupHeader(list, {
+    id: null,
+    name: '未分類',
+    collapsed: ungroupedCollapsed,
+    isUngrouped: true
   });
+  if (!ungroupedCollapsed) {
+    ungrouped.forEach(tag => list.appendChild(createTagPill(tag)));
+  }
+
+  savedGroups.forEach(group => {
+    list.appendChild(createGroupSeparator());
+    appendGroupHeader(list, group);
+    if (group.collapsed) return;
+
+    sortedTags
+      .filter(tag => tag.groupId === group.id)
+      .forEach(tag => list.appendChild(createTagPill(tag)));
+  });
+}
+
+function createTagPill(tag) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'tag-pill' + (tag.id === activeTagId ? ' active' : '');
+  btn.textContent = tag.tagname;
+  btn.onclick = () => selectTag(tag.id);
+  btn.oncontextmenu = e => {
+    e.preventDefault();
+    showTagCtxMenu(e, tag);
+  };
+  return btn;
+}
+
+function createGroupSeparator() {
+  const sep = document.createElement('span');
+  sep.className = 'tag-group-sep';
+  return sep;
+}
+
+function appendGroupHeader(list, group) {
+  const header = document.createElement('span');
+  header.className = 'tag-group-header';
+  header.dataset.groupId = group.isUngrouped ? '__ungrouped__' : String(group.id);
+  header.innerHTML = `<span class="tag-group-caret">${group.collapsed ? '▶' : '▼'}</span><span class="tag-group-name">${esc(group.name)}</span>`;
+  header.onclick = e => handleGroupHeaderClick(e, group);
+  header.ondblclick = e => {
+    e.preventDefault();
+    if (header._clickTimer) {
+      clearTimeout(header._clickTimer);
+      header._clickTimer = null;
+    }
+    if (!group.isUngrouped) renameGroupInline(header, group.id);
+  };
+  header.oncontextmenu = e => {
+    e.preventDefault();
+    if (!group.isUngrouped) showGroupCtxMenu(e, group.id);
+  };
+  list.appendChild(header);
+}
+
+function handleGroupHeaderClick(e, group) {
+  const header = e.currentTarget;
+  if (header._clickTimer) clearTimeout(header._clickTimer);
+
+  header._clickTimer = setTimeout(() => {
+    if (group.isUngrouped) {
+      ungroupedCollapsed = !ungroupedCollapsed;
+    } else {
+      const savedGroup = savedGroups.find(g => g.id === group.id);
+      if (savedGroup) {
+        savedGroup.collapsed = !savedGroup.collapsed;
+        persistGroups();
+      }
+    }
+    renderTagList();
+  }, 180);
+}
+
+function newGroup() {
+  const name = prompt('グループ名を入力してください');
+  if (!name || !name.trim()) return;
+
+  const trimmed = name.trim();
+  savedGroups.push({ id: Date.now(), name: trimmed, collapsed: false });
+  persistGroups();
+  renderTagList();
+  showToast(`グループ "${trimmed}" を作成しました`);
+}
+
+function persistGroups() {
+  try {
+    localStorage.setItem(GROUP_STORAGE_KEY, JSON.stringify(savedGroups));
+  } catch (e) {
+    console.error(e);
+    showToast('localStorage への保存に失敗しました');
+  }
+}
+
+function loadGroups() {
+  try {
+    const raw = localStorage.getItem(GROUP_STORAGE_KEY);
+    if (!raw) {
+      savedGroups = [];
+      return;
+    }
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) {
+      savedGroups = data
+        .filter(g => g && typeof g === 'object' && g.id != null)
+        .map(g => ({
+          id: g.id,
+          name: String(g.name ?? ''),
+          collapsed: Boolean(g.collapsed)
+        }))
+        .filter(g => g.name.trim());
+    } else {
+      savedGroups = [];
+    }
+  } catch (e) {
+    console.error(e);
+    savedGroups = [];
+  }
+}
+
+function showTagCtxMenu(e, tag) {
+  const items = [];
+  if (tag.groupId !== null) {
+    items.push({ label: '未分類に戻す', action: () => moveTagToGroup(tag.id, null) });
+  }
+  savedGroups.forEach(group => {
+    items.push({ label: group.name, action: () => moveTagToGroup(tag.id, group.id) });
+  });
+
+  if (!items.length) return;
+  showCtxMenu(e, [{ label: 'グループに移動 ▶', action: null }, ...items]);
+}
+
+function showGroupCtxMenu(e, groupId) {
+  const header = e.currentTarget;
+  showCtxMenu(e, [
+    { label: '名前を変更', action: () => renameGroupInline(header, groupId) },
+    { label: '削除（タグは未分類に移動）', action: () => deleteGroup(groupId) }
+  ]);
+}
+
+function showCtxMenu(e, items) {
+  const menu = document.getElementById('ctxMenu');
+  if (!menu) return;
+
+  menu.innerHTML = '';
+  items.forEach(item => {
+    if (item.separator) {
+      const sep = document.createElement('hr');
+      sep.className = 'ctx-menu-sep';
+      menu.appendChild(sep);
+      return;
+    }
+
+    const row = document.createElement('div');
+    row.className = 'ctx-menu-item' + (!item.action ? ' disabled' : '');
+    row.textContent = item.label;
+    if (item.action) {
+      row.onclick = event => {
+        event.stopPropagation();
+        hideCtxMenu();
+        item.action();
+      };
+    }
+    menu.appendChild(row);
+  });
+
+  menu.classList.remove('hidden');
+  const x = Math.min(e.clientX, window.innerWidth - menu.offsetWidth - 8);
+  const y = Math.min(e.clientY, window.innerHeight - menu.offsetHeight - 8);
+  menu.style.left = `${Math.max(8, x)}px`;
+  menu.style.top = `${Math.max(8, y)}px`;
+}
+
+function hideCtxMenu() {
+  const menu = document.getElementById('ctxMenu');
+  if (menu) menu.classList.add('hidden');
+}
+
+function moveTagToGroup(tagId, groupId) {
+  const tag = savedTags.find(t => t.id === tagId);
+  if (!tag) return;
+
+  tag.groupId = groupId;
+  tag.updatedAt = Date.now();
+  persistTags();
+  renderTagList();
+}
+
+function deleteGroup(groupId) {
+  savedTags.forEach(tag => {
+    if (tag.groupId === groupId) tag.groupId = null;
+  });
+  savedGroups = savedGroups.filter(group => group.id !== groupId);
+  persistTags();
+  persistGroups();
+  renderTagList();
+}
+
+function renameGroupInline(headerEl, groupId) {
+  const group = savedGroups.find(g => g.id === groupId);
+  if (!group || headerEl.querySelector('input')) return;
+
+  const nameEl = headerEl.querySelector('.tag-group-name');
+  if (!nameEl) return;
+
+  const input = document.createElement('input');
+  input.className = 'tag-group-input';
+  input.type = 'text';
+  input.value = group.name;
+  nameEl.replaceWith(input);
+  input.focus();
+  input.select();
+
+  let closed = false;
+  const commit = () => {
+    if (closed) return;
+    closed = true;
+    const next = input.value.trim();
+    if (next) {
+      group.name = next;
+      persistGroups();
+    }
+    renderTagList();
+  };
+
+  input.onblur = commit;
+  input.onkeydown = e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      commit();
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      renderTagList();
+    }
+  };
 }
 
 function selectTag(id) {
@@ -313,7 +557,8 @@ function loadTags() {
           id: t.id ?? Date.now(),
           prompt: String(t.prompt ?? ''),
           tagname: String(t.tagname ?? ''),
-          updatedAt: t.updatedAt ?? Date.now()
+          updatedAt: t.updatedAt ?? Date.now(),
+          groupId: t.groupId ?? null
         }));
     } else {
       savedTags = [];
@@ -326,5 +571,10 @@ function loadTags() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  loadGroups();
   loadTags();
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#ctxMenu')) hideCtxMenu();
 });
