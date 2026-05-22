@@ -6,4 +6,4 @@ LLM用のプロンプトをメモって、保存する。グループで管理�
 
 <img src=./prompt-editor.png><br>
 <br>
-prompt-editor.html が、ローカル単体動作する。<br>
+prompt-editor.html が、ローカル単体動作バージョン。<br>
