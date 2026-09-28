@@ -4,6 +4,6 @@ LLM用のプロンプトをメモって、保存する。グループで管理�
 
 <a href="https://amadasirou.github.io/prompt-editor/index.html">prompt-editor</a><br><br>
 
-<img src=./prompt-editor.png><br>
+<img src=./img.jpg><br>
 <br>
 prompt-editor.html が、ローカル単体動作バージョン。<br>
