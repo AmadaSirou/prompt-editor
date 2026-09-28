@@ -9,9 +9,9 @@
 <body>
 
 <header>
-  <span class="logo">PromptVar</span>
-  <span class="header-sep">|</span>
-  <span class="header-sub">LLM Prompt Variable Editor</span>
+  <span class="logo">PromptVar <span class="logo-ja">プロンプト変数</span></span>
+  <span class="header-sub">LLM Prompt <span class="header-sep">//</span> Variable Editor <span class="header-sep">+</span> Replace Sequence</span>
+  <span class="header-status"><span class="dot dot-accent"></span>SYS Online <span class="header-status-ja">稼働中</span></span>
 </header>
 
 <div class="workspace">
@@ -19,7 +19,7 @@
   <div class="left">
     <div class="pane-label">
       <span class="dot dot-teal"></span>
-      Variables
+      Variables <span class="pane-label-ja">変数</span>
     </div>
     <div class="var-list" id="varList">
       <div class="var-list-empty" id="emptyMsg">
@@ -50,9 +50,9 @@
     </div>
     <div class="prompt-topbar">
       <div class="prompt-topbar-left">
-        <div class="pane-label" style="border:none;padding:0;">
-          <span class="dot dot-accent"></span>
-          Prompt
+        <div class="pane-label pane-label-inline">
+          <span class="dot dot-teal"></span>
+          Prompt <span class="pane-label-ja">本文</span>
         </div>
         <span class="var-count" id="varCount"></span>
       </div>
@@ -69,6 +69,13 @@
   </div>
 
 </div>
+
+<footer class="ticker">
+  <div class="ticker-track">
+    <span>変数検出 // {{VAR}} Scan // 一括置換 Ready // LocalStorage Sync // グループ管理 Online // Prompt Variable Editor Standing By //</span>
+    <span>変数検出 // {{VAR}} Scan // 一括置換 Ready // LocalStorage Sync // グループ管理 Online // Prompt Variable Editor Standing By //</span>
+  </div>
+</footer>
 
 <div class="toast" id="toast"></div>
 <div id="ctxMenu" class="ctx-menu hidden"></div>

@@ -1,0 +1,19 @@
+/**
+ * EVA HUD 系（オレンジ × 黒）
+ * EVA HUD - Dark Mode
+ */
+
+:root {
+  --bg: #080503;
+  --surface: #0f0905;
+  --surface2: #1a0f07;
+  --border: #4a260c;
+  --border2: #8a4515;
+  --accent: #ffb347;
+  --teal: #ff7a1a;
+  --teal-dim: rgba(255, 122, 26, 0.12);
+  --warn: #ff3b1f;
+  --text: #f3c08a;
+  --text-dim: #8a5a33;
+  --text-bright: #ffe2b8;
+}
